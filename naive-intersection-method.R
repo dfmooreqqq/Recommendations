@@ -28,7 +28,6 @@ splitlastfm<-split(lastfmdata$User, lastfmdata$Artist)
 splitlastfm_keep<-splitlastfm
 
 #setuserlimit
-userlimit<-500
 pb<-txtProgressBar(1, length(splitlastfm), style=3)
 pbi<-0
 
@@ -42,7 +41,9 @@ for(i in length(splitlastfm):1){
 
 matchup <- data.frame(artist1=character(),
                       artist2=character(),
-                      intersection=numeric(), stringsAsFactors=FALSE)
+                      intersection=numeric(),
+                      jaccardintersection=numeric(),
+                      stringsAsFactors=FALSE)
 
 commonusersthreshold <- 1
 
@@ -59,19 +60,24 @@ for(i in 1:length(splitlastfm))
         if((length(intersect(splitlastfm[[i]], splitlastfm[[j]])) > commonusersthreshold) & i!=j) # the i!= j removes self-similarity
         {
             matchup<-rbind(matchup, 
-                           data.frame(artist1=as.character(names(splitlastfm[i])), 
-                             artist2=as.character(names(splitlastfm[j])), 
-                             intersection=length(intersect(splitlastfm[[i]], splitlastfm[[j]]))))
+                        data.frame(
+                            artist1=as.character(names(splitlastfm[i])), 
+                            artist2=as.character(names(splitlastfm[j])), 
+                            intersection=length(intersect(splitlastfm[[i]], splitlastfm[[j]])),
+                            jaccardintersection=length(intersect(splitlastfm[[i]], splitlastfm[[j]]))/(length(splitlastfm[[i]])+length(splitlastfm[[j]]))
+                        )
+                        )
         }
     }
 }
 
 
 # Now, give me an artist name and I'll give the top 5 similar artists
-artist = "coldplay"
-
 artistlist = matchup[matchup$artist1==artist,]
+
+#by naive intersection
 artistlist = arrange(artistlist, desc(intersection)) #from plyr
-artistlisttop5 = artistlist[1:5,2]
+artistlisttop5 = artistlist[1:5,2:3]
 
-
+#by jaccard intersection
+artistlistjaccard = arrange(artistlist, desc(jaccardintersection)) #from plyr
