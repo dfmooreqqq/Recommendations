@@ -1,6 +1,6 @@
 ## Environment setup
 # Load packages.
-packages <- c("gdata", "ggplot2", "plyr")
+packages <- c("gdata", "ggplot2", "plyr", "reshape2", "tm")
 packages <- lapply(packages, FUN = function(x) {
     if (!require(x, character.only = TRUE)) {
         install.packages(x)
@@ -15,28 +15,63 @@ setwd(workingdir)
 lastfmdata<-read.csv("lastfm-dataset-as-csv.csv", header = FALSE)
 names(lastfmdata)<-c("User", "ArtistId", "Artist","Plays")
 
+for(i in 1:length(lastfmdata)){
+    lastfmdata$Artist_clean[i]<-removePunctuation(as.character(lastfmdata$Artist[i]))
+    lastfmdata$Artist_clean[i]<-tolower(as.character(lastfmdata$Artist[i]))
+    lastfmdata$Artist_clean[i]<-stripWhitespace(as.character(lastfmdata$Artist[i]))
+}
+
 
 
 #takes a long time
 splitlastfm<-split(lastfmdata$User, lastfmdata$Artist)
+splitlastfm_keep<-splitlastfm
+
+#setuserlimit
+userlimit<-500
+pb<-txtProgressBar(1, length(splitlastfm), style=3)
+pbi<-0
+
+for(i in length(splitlastfm):1){
+    pbi<-pbi+1
+    setTxtProgressBar(pb, pbi)
+    if(length(splitlastfm[[i]])<userlimit){
+        splitlastfm[[i]]<-NULL
+    }
+}
 
 matchup <- data.frame(artist1=character(),
                       artist2=character(),
-                      intersection=numeric())
+                      intersection=numeric(), stringsAsFactors=FALSE)
 
-commonusersthreshold <- 100
+commonusersthreshold <- 1
 
 # This takes way to long
+pb<-txtProgressBar(1, length(splitlastfm), style=3)
+pbi<-0
 for(i in 1:length(splitlastfm))
 {
+    pbi<-pbi+1
+    setTxtProgressBar(pb, pbi)
+    
     for(j in 1:length(splitlastfm))
     {
-        if(length(intersect(splitlastfm[[i]], splitlastfm[[j]])) > commonusersthreshold) 
+        if((length(intersect(splitlastfm[[i]], splitlastfm[[j]])) > commonusersthreshold) & i!=j) # the i!= j removes self-similarity
         {
             matchup<-rbind(matchup, 
-                    c(names(splitlastfm[i]), 
-                    names(splitlastfm[j]), 
-                    length(intersect(splitlastfm[[i]], splitlastfm[[j]]))))
+                           data.frame(artist1=as.character(names(splitlastfm[i])), 
+                             artist2=as.character(names(splitlastfm[j])), 
+                             intersection=length(intersect(splitlastfm[[i]], splitlastfm[[j]]))))
         }
     }
 }
+
+
+# Now, give me an artist name and I'll give the top 5 similar artists
+artist = "coldplay"
+
+artistlist = matchup[matchup$artist1==artist,]
+artistlist = arrange(artistlist, desc(intersection)) #from plyr
+artistlisttop5 = artistlist[1:5,2]
+
+
