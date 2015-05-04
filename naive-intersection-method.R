@@ -24,7 +24,7 @@ for(i in 1:length(lastfmdata)){
 
 
 #takes a long time
-splitlastfm<-split(lastfmdata$User, lastfmdata$Artist)
+splitlastfm<-split(lastfmdata$User, lastfmdata$Artist, drop=TRUE)
 splitlastfm_keep<-splitlastfm
 
 #setuserlimit
