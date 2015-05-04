@@ -28,6 +28,7 @@ splitlastfm<-split(lastfmdata$User, lastfmdata$Artist)
 splitlastfm_keep<-splitlastfm
 
 #setuserlimit
+userlimit<-250
 pb<-txtProgressBar(1, length(splitlastfm), style=3)
 pbi<-0
 
@@ -73,6 +74,7 @@ for(i in 1:length(splitlastfm))
 
 
 # Now, give me an artist name and I'll give the top 5 similar artists
+artist = "3 doors down"
 artistlist = matchup[matchup$artist1==artist,]
 
 #by naive intersection
@@ -81,3 +83,4 @@ artistlisttop5 = artistlist[1:5,2:3]
 
 #by jaccard intersection
 artistlistjaccard = arrange(artistlist, desc(jaccardintersection)) #from plyr
+artistlisttop5jaccard = artistlistjaccard[1:5,c(2,4)]
