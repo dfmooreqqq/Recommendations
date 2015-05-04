@@ -1,6 +1,6 @@
 ## Environment setup
 # Load packages.
-packages <- c("gdata", "ggplot2")
+packages <- c("gdata", "ggplot2", "plyr")
 packages <- lapply(packages, FUN = function(x) {
     if (!require(x, character.only = TRUE)) {
         install.packages(x)
@@ -14,3 +14,7 @@ setwd(workingdir)
 
 lastfmdata<-read.csv("lastfm-dataset-as-csv.csv", header = FALSE)
 names(lastfmdata)<-c("User", "ArtistId", "Artist","Plays")
+
+
+#takes a long time
+splitlastfm<-split(lastfmdata$User, lastfmdata$Artist)
