@@ -39,7 +39,7 @@ splitlastfm<-split(lastfmdata$User, lastfmdata$Artist, drop=TRUE)
 splitlastfm_keep<-splitlastfm
 
 #setuserlimit
-userlimit<-250
+userlimit<-1000 # set to 1000 for faster running
 pb<-txtProgressBar(1, length(splitlastfm), style=3)
 pbi<-0
 
