@@ -58,7 +58,13 @@ matchup <- data.frame(artist1=character(),
                       angle= numeric(),
                       stringsAsFactors=FALSE)
 
+
+pb<-txtProgressBar(1, length(dcastsubset), style=3)
+pbi<-0
+
 for(i in 1:length(dcastsubset)){
+    pbi<-pbi+1
+    setTxtProgressBar(pb, pbi)
     v1<-as.vector(dcastsubset[i,-1])
     for(j in 1:length(dcastsubset)){
         v2<-as.vector(dcastsubset[j,-1])
@@ -66,8 +72,8 @@ for(i in 1:length(dcastsubset)){
         theta <- acos(theta)
         matchup<-rbind(matchup,
                        data.frame(
-                           artist1=as.character(names(dcastsubset[i,1])), 
-                           artist2=as.character(names(dcastsubset[j,1])), 
+                           artist1=as.character(dcastsubset$Artist[i]), 
+                           artist2=as.character(dcastsubset$Artist[j]), 
                            angle=theta
                        ))
     }
