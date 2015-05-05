@@ -10,6 +10,14 @@ packages <- lapply(packages, FUN = function(x) {
     }
 })
 
+angle <- function(x,y){
+    dot.prod <- x%*%y 
+    norm.x <- norm(x,type="2")
+    norm.y <- norm(y,type="2")
+    theta <- acos(dot.prod / (norm.x * norm.y))
+    as.numeric(theta)
+}
+
 # Set working directory
 workingdir<-paste("C:\\Users", Sys.getenv("USERNAME"), "Documents\\GitHub\\Recommendations", sep = "\\")
 setwd(workingdir)
@@ -31,7 +39,7 @@ splitlastfm<-split(lastfmdata$User, lastfmdata$Artist, drop=TRUE)
 splitlastfm_keep<-splitlastfm
 
 #setuserlimit
-userlimit<-1000
+userlimit<-250
 pb<-txtProgressBar(1, length(splitlastfm), style=3)
 pbi<-0
 
@@ -59,20 +67,21 @@ matchup <- data.frame(artist1=character(),
                       stringsAsFactors=FALSE)
 
 
-pb<-txtProgressBar(1, length(dcastsubset), style=3)
+pb<-txtProgressBar(1, dim(dcastsubset)[1]^2, style=3)
 pbi<-0
 
 for(i in 1:dim(dcastsubset)[1]){
-    pbi<-pbi+1
-    setTxtProgressBar(pb, pbi)
     v1<-as.matrix(dcastsubset[i,-1])
     for(j in 1:dim(dcastsubset)[1]){
-        
+        pbi<-pbi+1
+        setTxtProgressBar(pb, pbi)
         if(i!=j){
             v2<-as.matrix(dcastsubset[j,-1])
-            theta <- ( sum(v1*v2) / ( sqrt(sum(v1 * v1)) + sqrt(sum(v2 * v2)) ) )
+            #theta <- ( sum(v1*v2) / ( sqrt(sum(v1 * v1)) + sqrt(sum(v2 * v2)) ) )
             #if(theta>1){theta<-0} else {
-                theta <- acos(theta)
+            #    theta <- acos(theta)
+            theta<-angle(v1, t(v2))
+            theta<-theta*(180/pi)
             #}
 
         }
@@ -86,8 +95,3 @@ for(i in 1:dim(dcastsubset)[1]){
 
     }
 }
-
-
-
-
-
