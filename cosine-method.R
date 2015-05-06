@@ -85,7 +85,7 @@ for(i in 1:dim(dcastsubset)[1]){
             #}
 
         }
-        else {theta<-0}
+        else {theta<-1}
         matchup<-rbind(matchup,
                        data.frame(
                            artist1=as.character(dcastsubset$Artist[i]), 
@@ -104,7 +104,7 @@ artist = "u2"
 artistlist = matchup[matchup$artist1==artist,]
 
 #by angle
-artistlist = arrange(artistlist, angle) #from plyr
+artistlist = arrange(artistlist, desc(angle)) #from plyr
 artistlisttop5 = artistlist[2:6,2:3] # because the first one will be the artist
 
 
