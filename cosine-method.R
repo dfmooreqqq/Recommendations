@@ -100,11 +100,11 @@ for(i in 1:dim(dcastsubset)[1]){
 
 
 # Now, give me an artist name and I'll give the top 5 similar artists
-artist = "u2"
+artist = "radiohead"
 artistlist = matchup[matchup$artist1==artist,]
 
 #by angle
-artistlist = arrange(artistlist, desc(angle)) #from plyr
+artistlist = arrange(artistlist, angle) #from plyr
 artistlisttop5 = artistlist[2:6,2:3] # because the first one will be the artist
 
 
