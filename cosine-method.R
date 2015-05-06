@@ -39,7 +39,7 @@ splitlastfm<-split(lastfmdata$User, lastfmdata$Artist, drop=TRUE)
 splitlastfm_keep<-splitlastfm
 
 #setuserlimit
-userlimit<-1000 # set to 1000 for faster running
+userlimit<-500 # set to 1000 for faster running
 pb<-txtProgressBar(1, length(splitlastfm), style=3)
 pbi<-0
 
@@ -95,3 +95,16 @@ for(i in 1:dim(dcastsubset)[1]){
 
     }
 }
+
+
+
+
+# Now, give me an artist name and I'll give the top 5 similar artists
+artist = "u2"
+artistlist = matchup[matchup$artist1==artist,]
+
+#by angle
+artistlist = arrange(artistlist, angle) #from plyr
+artistlisttop5 = artistlist[2:6,2:3] # because the first one will be the artist
+
+
