@@ -64,6 +64,7 @@ dcastsubset[is.na(dcastsubset)]<-0
 matchup <- data.frame(artist1=character(),
                       artist2=character(),
                       angle= numeric(),
+                      anglesmoothed = numeric(),
                       stringsAsFactors=FALSE)
 
 
@@ -72,25 +73,29 @@ pbi<-0
 
 for(i in 1:dim(dcastsubset)[1]){
     v1<-as.matrix(dcastsubset[i,-1])
+    v1binarize<-ifelse(v1>0,1,0)
     for(j in 1:dim(dcastsubset)[1]){
         pbi<-pbi+1
         setTxtProgressBar(pb, pbi)
         if(i!=j){
             v2<-as.matrix(dcastsubset[j,-1])
-            #theta <- ( sum(v1*v2) / ( sqrt(sum(v1 * v1)) + sqrt(sum(v2 * v2)) ) )
-            #if(theta>1){theta<-0} else {
-            #    theta <- acos(theta)
+            v2binarize<-ifelse(v2>0,1,0)
             theta<-angle(v1, t(v2))
             theta<-theta*(180/pi)
-            #}
-
+            overlap<-(v1binarize%*%t(v2binarize))
+            smoothedcos<-(overlap / (SMOOTHING + overlap))*cos(theta*pi/180)
+            thetasmoothed<-acos(smoothedcos) * (180/pi)
         }
-        else {theta<-1}
+        else {            
+            theta<-0
+            thetasmoothed<-0
+        }
         matchup<-rbind(matchup,
                        data.frame(
                            artist1=as.character(dcastsubset$Artist[i]), 
                            artist2=as.character(dcastsubset$Artist[j]), 
-                           angle=theta
+                           angle = theta,
+                           anglesmoothed = thetasmoothed[1]
                        ))  
 
     }
@@ -104,7 +109,7 @@ artist = "radiohead"
 artistlist = matchup[matchup$artist1==artist,]
 
 #by angle
-artistlist = arrange(artistlist, angle) #from plyr
+artistlist = arrange(artistlist, anglesmoothed) #from plyr
 artistlisttop5 = artistlist[2:6,2:3] # because the first one will be the artist
 
 
