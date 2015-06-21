@@ -45,3 +45,4 @@ Temporary Items
 
 # R history files
 .rhistory
+*.RDataTmp
