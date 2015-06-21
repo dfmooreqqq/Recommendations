@@ -53,15 +53,22 @@ for(i in length(splitlastfm):1){
 }
 
 idf<-rep(0,length(splitlastfm))
+numusers<-rep(0,length(splitlastfm))
 pbi<-0
 for(i in 1:length(splitlastfm)){
     pbi<-pbi+1
     setTxtProgressBar(pb, pbi)
     idf[i]<-log1p(length(splitlastfm)/(1+length(splitlastfm[[i]])))
+    numusers[i]<-length(splitlastfm[[i]])
 }
-
 
 a<-melt(splitlastfm)
 lastfmdatasubset<-lastfmdata[lastfmdata$Artist %in% unique(a$L1),] # gives me only artist with more than the user limit of users
-rm(a,i,packages, pb,pbi)
 
+plays = ddply(lastfmdatasubset, .(Artist), function(x) avgplays = mean(x$Plays))
+idfdatatable<-data.frame(artist=names(splitlastfm), idf=idf, avgplays = plays$V1, numusers=numusers)
+
+
+
+
+rm(a,i,packages, pb,pbi, plays, numusers)
