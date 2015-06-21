@@ -29,11 +29,11 @@ setwd(workingdir)
 lastfmdata<-read.csv("lastfm-dataset-as-csv.csv", header = FALSE)
 names(lastfmdata)<-c("User", "ArtistId", "Artist","Plays")
 
-for(i in 1:length(lastfmdata)){
-    lastfmdata$Artist_clean[i]<-removePunctuation(as.character(lastfmdata$Artist[i]))
-    lastfmdata$Artist_clean[i]<-tolower(as.character(lastfmdata$Artist[i]))
-    lastfmdata$Artist_clean[i]<-stripWhitespace(as.character(lastfmdata$Artist[i]))
-}
+# for(i in 1:length(lastfmdata)){
+#     lastfmdata$Artist_clean[i]<-removePunctuation(as.character(lastfmdata$Artist[i]))
+#     lastfmdata$Artist_clean[i]<-tolower(as.character(lastfmdata$Artist[i]))
+#     lastfmdata$Artist_clean[i]<-stripWhitespace(as.character(lastfmdata$Artist[i]))
+# }
 
 #takes a long time
 splitlastfm<-split(lastfmdata$User, lastfmdata$Artist, drop=TRUE)
@@ -42,7 +42,7 @@ splitlastfm_keep<-splitlastfm
 #setuserlimit
 userlimit<-500 # set to 1000 for faster running
 pb<-txtProgressBar(1, length(splitlastfm), style=3)
-
+pbi<-0
 
 for(i in length(splitlastfm):1){
     pbi<-pbi+1
