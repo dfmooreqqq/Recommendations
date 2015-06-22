@@ -19,8 +19,6 @@ angle <- function(x,y){
 
 bm25weight <- function(artistusers, idf, average_plays, B, K1){
     length_norm <- (1-B)+B*artistusers/average_plays
-    
-    for
     data<-([(plays*(K1+1)/(K1*length_norm+plays))*idf])
 }
 
