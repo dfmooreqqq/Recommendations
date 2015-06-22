@@ -20,6 +20,8 @@ angle <- function(x,y){
 bm25weight <- function(artistusers, idf, average_plays, B, K1){
     length_norm <- (1-B)+B*artistusers/average_plays
     
+    for
+    data<-([(plays*(K1+1)/(K1*length_norm+plays))*idf])
 }
 
 # Set working directory
@@ -40,7 +42,7 @@ splitlastfm<-split(lastfmdata$User, lastfmdata$Artist, drop=TRUE)
 splitlastfm_keep<-splitlastfm
 
 #setuserlimit
-userlimit<-500 # set to 1000 for faster running
+userlimit<-200 # set to 1000 for faster running
 pb<-txtProgressBar(1, length(splitlastfm), style=3)
 pbi<-0
 
@@ -66,9 +68,54 @@ a<-melt(splitlastfm)
 lastfmdatasubset<-lastfmdata[lastfmdata$Artist %in% unique(a$L1),] # gives me only artist with more than the user limit of users
 
 plays = ddply(lastfmdatasubset, .(Artist), function(x) avgplays = mean(x$Plays))
-idfdatatable<-data.frame(artist=names(splitlastfm), idf=idf, avgplays = plays$V1, numusers=numusers)
+normalizedfreq<-0.5+(0.5*numusers)/(max(numusers)) # see https://en.wikipedia.org/wiki/Tf%E2%80%93idf - double normalization of TF
+idfdatatable<-data.frame(artist=names(splitlastfm), idf=idf, avgplays = plays$V1, numusers=numusers, normalizedTF = normalizedfreq)
+
+
+## now we'll create the data table for cosine based on idf, normalizedTF, and avg plays
+#now create data table for cosine
+matchup <- data.frame(artist1=character(),
+                      artist2=character(),
+                      angle= numeric(),
+                      stringsAsFactors=FALSE)
+
+
+pb<-txtProgressBar(1, dim(idfdatatable)[1]^2, style=3)
+pbi<-0
+
+for(i in 1:dim(idfdatatable)[1]){
+    v1<-as.matrix(idfdatatable[i,2:3])
+    for(j in 1:dim(idfdatatable)[1]){
+        pbi<-pbi+1
+        setTxtProgressBar(pb, pbi)
+        if(i!=j){
+            v2<-as.matrix(idfdatatable[j,2:3])
+            theta<-angle(v1, t(v2))
+            theta<-theta*(180/pi)
+        }
+        else {            
+            theta<-0
+        }
+        matchup<-rbind(matchup,
+                       data.frame(
+                           artist1=as.character(idfdatatable$artist[i]), 
+                           artist2=as.character(idfdatatable$artist[j]), 
+                           angle = theta
+                       ))  
+        
+    }
+}
+
+# Now, give me an artist name and I'll give the top 5 similar artists
+artist = "the beatles"
+artistlist = matchup[matchup$artist1==artist,]
+
+#by angle
+artistlist = arrange(artistlist, angle) #from plyr
+artistlisttop5 = artistlist[2:6,2:3] # because the first one will be the artist
 
 
 
 
-rm(a,i,packages, pb,pbi, plays, numusers)
+
+rm(a,i,packages, pb,pbi, plays, numusers, normalizedfreq,v1,v2,artist,i,j,theta)
