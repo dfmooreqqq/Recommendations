@@ -116,4 +116,4 @@ artistlisttop5 = artistlist[2:6,2:3] # because the first one will be the artist
 
 
 
-rm(a,i,packages, pb,pbi, plays, numusers, normalizedfreq,v1,v2,artist,i,j,theta)
+rm(a,packages, pb,pbi, plays, numusers, normalizedfreq,v1,v2,artist,i,j,theta)
