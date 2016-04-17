@@ -2,7 +2,7 @@
 
 ## Environment setup
 # Load packages.
-packages <- c("gdata", "ggplot2", "plyr", "reshape2", "tm", "dplyr")
+packages <- c("gdata", "ggplot2", "plyr", "reshape2", "tm", "dplyr", "Matrix")
 packages <- lapply(packages, FUN = function(x) {
     if (!require(x, character.only = TRUE)) {
         install.packages(x)
@@ -12,8 +12,8 @@ packages <- lapply(packages, FUN = function(x) {
 
 angle <- function(x,y){
     dot.prod <- x%*%y 
-    norm.x <- norm(x,type="2")
-    norm.y <- norm(y,type="2")
+    norm.x <- norm(x,type="I")
+    norm.y <- norm(y,type="I")
     theta <- acos(dot.prod / (norm.x * norm.y))
     as.numeric(theta)
 }
@@ -83,7 +83,7 @@ for(i in 1:dim(dcastsubset)[1]){
             theta<-angle(v1, t(v2))
             theta<-theta*(180/pi)
             overlap<-(v1binarize%*%t(v2binarize))
-            smoothedcos<-(overlap / (SMOOTHING + overlap))*cos(theta*pi/180)
+            smoothedcos<-(overlap / (2 + overlap))*cos(theta*pi/180)
             thetasmoothed<-acos(smoothedcos) * (180/pi)
         }
         else {            
